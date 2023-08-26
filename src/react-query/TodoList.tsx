@@ -15,17 +15,19 @@ const TodoList = () => {
       .get<Todo[]>("https://jsonplaceholder.typicode.com/todos")
       .then((res) => res.data);
 
-  /* the query hook obj also has a prop called error resp for keeping track of
-  the errors encountered during data fetching. When calling the query hook we
-  should also specify the types of error that we might encounted when fetching
-  data (that are indeed specific in this case to our axios lib). Thus we use
-  Error - the main axios class for errors. Pay attention to the types of the
-  data and error properties of our query hook. We need them in order to be 
-  able to access their values using the TS types check feature. */
-  const { data: todos, error } = useQuery<Todo[], Error>({
+  /* This is the beauty of react query: we ne longer need to use state hooks for
+  data, errors, loading state, etc., everything is being taken care of by default.
+   */
+  const {
+    data: todos,
+    error,
+    isLoading,
+  } = useQuery<Todo[], Error>({
     queryKey: ["todos"],
     queryFn: fetchTodos,
   });
+
+  if (isLoading) return <p>Loading...</p>;
 
   if (error) return <p>{error.message}</p>;
 
