@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
 interface Post {
@@ -9,32 +9,30 @@ interface Post {
 }
 
 interface PostQuery {
-  page: number;
   pageSize: number;
 }
 
 const usePosts = (query: PostQuery) => {
-  /* _start param is used here to query from x-y posts, and retrieve
-  _limit posts from the backend. */
-  const queryPosts = () =>
+  const queryPosts = ({ pageParam = 1 }) =>
     axios
       .get<Post[]>("https://jsonplaceholder.typicode.com/posts", {
         params: {
-          _start: (query.page - 1) * query.pageSize,
+          _start: (pageParam - 1) * query.pageSize,
           _limit: query.pageSize,
         },
       })
       .then((res) => res.data);
 
-  /* everytime our query changes, react will automatically fetch the
-   data from the backend. Set keepPreviousData to true to keep the
-   previous data when fetching based on a new query key. Defaults to false.
-  */
-  return useQuery<Post[], Error>({
+  return useInfiniteQuery<Post[], Error>({
     queryKey: ["posts", query],
     queryFn: queryPosts,
     staleTime: 1 * 60 * 1000,
     keepPreviousData: true,
+    // used here to implement pagination for infinite scroll queries
+    getNextPageParam: (lastPage, allPages) => {
+      // return the next page nr, e.g. 1 -> 2
+      return lastPage.length > 0 ? allPages.length + 1 : undefined;
+    },
   });
 };
 
