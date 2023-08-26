@@ -14,8 +14,6 @@ const useTodos = () => {
       .get<Todo[]>("https://jsonplaceholder.typicode.com/todos")
       .then((res) => res.data);
 
-  /* We can set query params locally for each separate query
-   */
   return useQuery<Todo[], Error>({
     queryKey: ["todos"],
     queryFn: fetchTodos,
