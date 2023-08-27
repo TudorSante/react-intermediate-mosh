@@ -3,31 +3,58 @@ import { useRef } from "react";
 import { Todo } from "./hooks/useTodos";
 import axios from "axios";
 
+interface AddTodoContext {
+  previousTodos: Todo[];
+}
+
 const TodoForm = () => {
-  // state hook for our query client
   const queryClient = useQueryClient();
 
-  /* the mutation obj has a prop isLoading similar to the react query obj
-  so we can use that to render the label of the button directly. */
-  const addTodo = useMutation<Todo, Error, Todo>({
+  /* To implement optimistic updates we need to use the onMutate property,
+  which is called before the mutation fn is executed. "variables" reffers
+  to the input = the data we send to the backend. */
+  const addTodo = useMutation<Todo, Error, Todo, AddTodoContext>({
     mutationFn: (todo: Todo) =>
       axios
-        .post<Todo>("https://jsonplaceholder.typicode.com/todos", todo)
+        .post<Todo>("https://jsonplaceholder.typicode.com/todosx", todo)
         .then((res) => res.data),
-    onSuccess: (savedTodo, newTodo) => {
+    onMutate: (newTodo: Todo) => {
+      /* create a context obj in this callback and return it so that we can
+      access it inside the onError handler. In this context we should store
+      the previous todos before updating the cache. */
+      const previousTodos = queryClient.getQueryData<Todo[]>(["todos"]) || [];
+
       queryClient.setQueryData<Todo[]>(["todos"], (todos) => [
-        savedTodo,
+        newTodo,
         ...(todos || []),
       ]);
 
-      // clear the value of the input field on success; use the ref hook here
       if (ref.current) ref.current.value = "";
+
+      return { previousTodos };
+    },
+    // the savedTodo that we got from the server, newTodo that we built at the client
+    onSuccess: (savedTodo, newTodo) => {
+      /* if the call to the backend is successful, we can replace the todo
+      (newTodo) with the new todo object from the backend (which should have
+      some fields updated, e.g. id). At this step we need to update ourselves
+      the obj inside the cache. */
+      queryClient.setQueryData<Todo[]>(["todos"], (todos) =>
+        todos?.map((todo) => (todo === newTodo ? savedTodo : todo))
+      );
+    },
+    /* if the callback fails, we should rollback the UI to the prev state.
+    3rd param = context = obj we create to pass data in between our callbacks
+    (we need a context obj that contains the prev todos before updating the
+    cache) */
+    onError: (error, newTodo, context) => {
+      if (!context) return;
+
+      queryClient.setQueryData<Todo[]>(["todos"], context.previousTodos);
     },
   });
   const ref = useRef<HTMLInputElement>(null);
 
-  /* the mutation hook object has a property error for keeping track
-  of the errors encountered while mutating the objects. */
   return (
     <>
       {addTodo.error && (
