@@ -1,5 +1,6 @@
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import axios from "axios";
+import { CACHE_KEY_POSTS } from "../constants";
 
 interface Post {
   id: number;
@@ -24,7 +25,7 @@ const usePosts = (query: PostQuery) => {
       .then((res) => res.data);
 
   return useInfiniteQuery<Post[], Error>({
-    queryKey: ["posts", query],
+    queryKey: [...CACHE_KEY_POSTS, query],
     queryFn: queryPosts,
     staleTime: 1 * 60 * 1000,
     keepPreviousData: true,
