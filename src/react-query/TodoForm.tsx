@@ -7,8 +7,8 @@ const TodoForm = () => {
   // state hook for our query client
   const queryClient = useQueryClient();
 
-  /* 1st param = TData = data type we get from the backend. 2nd param is 
-  the error obj. 3rd param = TVariables = data that is sent to the backend. */
+  /* the mutation obj has a prop isLoading similar to the react query obj
+  so we can use that to render the label of the button directly. */
   const addTodo = useMutation<Todo, Error, Todo>({
     mutationFn: (todo: Todo) =>
       axios
@@ -19,6 +19,9 @@ const TodoForm = () => {
         savedTodo,
         ...(todos || []),
       ]);
+
+      // clear the value of the input field on success; use the ref hook here
+      if (ref.current) ref.current.value = "";
     },
   });
   const ref = useRef<HTMLInputElement>(null);
@@ -48,7 +51,9 @@ const TodoForm = () => {
           <input ref={ref} type="text" className="form-control" />
         </div>
         <div className="col">
-          <button className="btn btn-primary">Add</button>
+          <button disabled={addTodo.isLoading} className="btn btn-primary">
+            {addTodo.isLoading ? "Adding..." : "Add"}
+          </button>
         </div>
       </form>
     </>
