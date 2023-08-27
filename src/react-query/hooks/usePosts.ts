@@ -29,9 +29,7 @@ const usePosts = (query: PostQuery) => {
     queryFn: queryPosts,
     staleTime: 1 * 60 * 1000,
     keepPreviousData: true,
-    // used here to implement pagination for infinite scroll queries
     getNextPageParam: (lastPage, allPages) => {
-      // return the next page nr, e.g. 1 -> 2
       return lastPage.length > 0 ? allPages.length + 1 : undefined;
     },
   });

@@ -1,0 +1,4 @@
+Tutorial: Mosh - ultimate-react-part2
+20 - Creating a Reusable API Client:
+	-> debugging apps in browser and VSC
+	-> cleaned up and reaorganized the code through the use of a custom API client class servicing all HTTP req
