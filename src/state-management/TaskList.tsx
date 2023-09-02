@@ -1,21 +1,17 @@
-import { useState } from 'react';
-
-interface Task {
-  id: number;
-  title: string;
-}
+import { useReducer } from "react";
+import taskListReducer from "./reducers/taskListReducer";
 
 const TaskList = () => {
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [tasks, dispatch] = useReducer(taskListReducer, []);
 
   return (
     <>
       <button
         onClick={() =>
-          setTasks([
-            { id: Date.now(), title: 'Task ' + Date.now() },
-            ...tasks,
-          ])
+          dispatch({
+            type: "Add",
+            task: { id: Date.now(), title: "Task " + Date.now() },
+          })
         }
         className="btn btn-primary my-3"
       >
@@ -30,9 +26,7 @@ const TaskList = () => {
             <span className="flex-grow-1">{task.title}</span>
             <button
               className="btn btn-outline-danger"
-              onClick={() =>
-                setTasks(tasks.filter((t) => t.id !== task.id))
-              }
+              onClick={() => dispatch({ type: "Delete", taskId: task.id })}
             >
               Delete
             </button>
@@ -44,3 +38,6 @@ const TaskList = () => {
 };
 
 export default TaskList;
+function useReducerSnippet(first: any, second: any, third: any): [any, any] {
+  throw new Error("Function not implemented.");
+}
