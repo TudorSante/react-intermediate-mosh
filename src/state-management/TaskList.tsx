@@ -1,8 +1,8 @@
-import { useReducer } from "react";
-import taskListReducer from "./reducers/taskListReducer";
+import { useContext } from "react";
+import TasksContext from "./contexts/tasksContext";
 
 const TaskList = () => {
-  const [tasks, dispatch] = useReducer(taskListReducer, []);
+  const { tasks, dispatch } = useContext(TasksContext);
 
   return (
     <>
@@ -38,6 +38,3 @@ const TaskList = () => {
 };
 
 export default TaskList;
-function useReducerSnippet(first: any, second: any, third: any): [any, any] {
-  throw new Error("Function not implemented.");
-}

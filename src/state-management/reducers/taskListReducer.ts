@@ -13,7 +13,7 @@ interface DeleteTask {
   taskId: number;
 }
 
-type TaskAction = AddTask | DeleteTask;
+export type TaskAction = AddTask | DeleteTask;
 
 const taskListReducer = (tasks: Task[], action: TaskAction): Task[] => {
   switch (action.type) {
