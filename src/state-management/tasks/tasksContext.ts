@@ -1,5 +1,5 @@
 import React from "react";
-import { Task, TaskAction } from "../reducers/taskListReducer";
+import { Task, TaskAction } from "./TasksProvider";
 
 /* this is the obj we are going to transport using React context. */
 interface TasksContextType {
