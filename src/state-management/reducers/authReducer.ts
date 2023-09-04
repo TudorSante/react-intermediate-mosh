@@ -1,4 +1,4 @@
-interface User {
+export interface User {
   name: string;
 }
 
@@ -11,7 +11,7 @@ interface LogoutAction {
   type: "Logout";
 }
 
-type AuthAction = LoginAction | LogoutAction;
+export type AuthAction = LoginAction | LogoutAction;
 
 const authReducer = (user: User, action: AuthAction): User => {
   switch (action.type) {
